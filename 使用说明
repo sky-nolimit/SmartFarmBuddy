@@ -1,0 +1,47 @@
+// 正确导入
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+@Composable
+fun AlarmScreen(
+    modifier: Modifier = Modifier,
+    // ⚠️ 不要用这种方式传参
+    // viewModel: WeatherViewModel,
+) {
+    // ✅ 在可组合函数内部获取 ViewModel
+    val weatherViewModel: WeatherViewModel = viewModel()
+    
+    // UI 代码...
+}
+//正确使用示例
+// WeatherViewModel.kt
+class WeatherViewModel : ViewModel() {
+    private val _city = MutableStateFlow("北京")
+    val city: StateFlow<String> = _city.asStateFlow()
+    
+    fun updateCity(newCity: String) {
+        _city.value = newCity
+    }
+}
+
+// WeatherScreen.kt
+@Composable
+fun WeatherScreen() {
+    val viewModel: WeatherViewModel = viewModel()
+    val city by viewModel.city.collectAsState()
+    
+    Column {
+        Text("当前城市: $city")
+        Button(onClick = { /* 跳转到 AlarmScreen */ }) {
+            Text("设置闹钟")
+        }
+    }
+}
+
+// AlarmScreen.kt
+@Composable
+fun AlarmScreen() {
+    val viewModel: WeatherViewModel = viewModel()
+    val city by viewModel.city.collectAsState()
+    
+    Text("为 $city 设置天气闹钟")
+}
